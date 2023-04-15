@@ -2,6 +2,7 @@ import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
+
 class ScreenVideo extends StatefulWidget {
   final String src;
   final VoidCallback? onError;
@@ -44,7 +45,7 @@ class _ScreenVideoState extends State<ScreenVideo> {
   @override
   void dispose() {
     _videoPlayerController!.dispose();
-    _controller!.dispose();
+    _controller!.dispose() ;
     super.dispose();
   }
 

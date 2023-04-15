@@ -49,6 +49,7 @@ dependencies:
   firebase_auth: ^4.4.0
   flutter_cache_manager: ^3.3.0
   flutter_swiper_null_safety: ^1.0.2
+  firebase_database: ^10.1.0
 
 dev_dependencies:
   flutter_test:

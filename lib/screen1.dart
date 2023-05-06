@@ -3,10 +3,9 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
+import 'package:stagesonic_video/model/Video.dart';
 import 'package:stagesonic_video/screen_video.dart';
-import 'package:video_player/video_player.dart';
-import 'Widgets/VideoPlayerWidget.dart';
-import 'model/Video.dart';
+
 
 class Screen1 extends StatefulWidget {
   const Screen1({Key? key}) : super(key: key);
@@ -19,27 +18,36 @@ class _Screen1State extends State<Screen1> {
   DatabaseReference dbRef = FirebaseDatabase.instance.ref().child('data');
   TextEditingController videoName = TextEditingController();
   TextEditingController description = TextEditingController();
-  List<String> videoUrls = [];
+  List<Video> videoUrls = [];
 
   @override
   void initState() {
     super.initState();
-    videosData();
+    WidgetsBinding.instance?.addPostFrameCallback((_) async {
+      await videosData();
+    });
   }
 
   Future<void> videosData() async {
     dbRef.onValue.listen((event) {
       DataSnapshot snapshot = event.snapshot;
+
       if (snapshot.value is Map) {
-        Map<String, dynamic> videos = Map<String, dynamic>.from(snapshot.value as Map<dynamic, dynamic>);
-        videoUrls.clear();
-        videos.forEach((key, value) {
-          videoUrls.add(value['url']);
+        Map<String, dynamic> videosData = Map<String, dynamic>.from(snapshot.value as Map<dynamic, dynamic>);
+        List<Video> fetchedVideos = [];
+
+        videosData.forEach((key, value) {
+          fetchedVideos.add(Video.fromDataSnapshot(snapshot.child(key)));
         });
-        setState(() {});
+
+        setState(() {
+          videoUrls = fetchedVideos;
+        });
       }
     });
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +56,7 @@ class _Screen1State extends State<Screen1> {
         child: videoUrls.isNotEmpty
             ? Swiper(
           itemBuilder: (BuildContext context, int index) {
-            return ScreenVideo (src :videoUrls[index]);
+            return ScreenVideo (src :videoUrls[index].url!);
 
           },
           itemCount: videoUrls.length,

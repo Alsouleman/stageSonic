@@ -4,6 +4,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:stagesonic_video/massages/Masseges.dart';
 import 'package:stagesonic_video/model/Video.dart';
 import 'package:stagesonic_video/screen1.dart';
 import 'VideoConference.dart';
@@ -43,17 +44,11 @@ class _MyHomePageState extends State<MyHomePage> {
   PlatformFile? pickerFile;
   UploadTask? task;
 
-  final _reference = FirebaseFirestore.instance.collection('files');
-  File? file;
+  final _reference = FirebaseFirestore.instance.collection('videos');
+  final dbRef = FirebaseDatabase.instance.ref().child('data');
+  File? videoFile;
   ImagePicker picker = ImagePicker();
-  var url;
-  DatabaseReference? dbRef;
 
-  @override
-  void initState() {
-    super.initState();
-    dbRef = FirebaseDatabase.instance.ref().child('data');
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -105,7 +100,6 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: Text("Go Live"))),
                 ElevatedButton(
                     onPressed: (){
-                      _selectFile();
                       _uploadVideo("test", "test description");
                     },
                     child: const Center(
@@ -127,27 +121,56 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Future _selectFile() async {
-    var img = await picker.pickVideo(source: ImageSource.gallery);
+  Future _selectVideo() async {
+    var ved = await picker.pickVideo(source: ImageSource.gallery);
     setState(() {
-      file = File(img!.path);
+      videoFile = File(ved!.path);
     });
   }
 
   Future _uploadVideo( String videoName , String description) async {
-    final path = 'files/videos/${file?.uri.path}';
-    final ref = FirebaseStorage.instance.ref().child(path);
-    task = ref.putFile(file!);
-    final snapshot = await task!.whenComplete(() {});
-    final urlDownload = await snapshot.ref.getDownloadURL();
-    print(urlDownload);
-    final Video videoToVideo = Video(
-        name: videoName, url: urlDownload, description: description);
-    _reference.add(videoToVideo.toJson());
-    dbRef!.push().set(videoToVideo.toJson()).whenComplete(() {
+    _selectVideo();
+   try{
+     final path = 'videos/${videoFile?.uri.path}';
+     print("Vidopath:     ${videoFile?.uri.path}");
+     final ref = FirebaseStorage.instance.ref().child(path);
+     task = ref.putFile(videoFile!);
+     final snapshot = await task!.whenComplete(() {});
+     final urlDownload = await snapshot.ref.getDownloadURL();
 
-    });
+     final Video videoToVideo = Video(
+         name: videoName, url: urlDownload, description: description);
+     _reference.add(videoToVideo.toJson());
+     dbRef!.push().set(videoToVideo.toJson()).whenComplete(() {
+
+     });
+   }
+       catch(e){
+     _showErrorDialog('${Messages.UPLOAD_FAILED}: $e', 3);
+       }
+
   }
+
+
+  void _showErrorDialog(String errorMessage, int duration) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // Schließt die Meldung automatisch nach der angegebenen Dauer
+        Future.delayed(Duration(seconds: duration), () {
+          if (Navigator.canPop(context)) {
+            Navigator.of(context).pop();
+          }
+        });
+
+        return AlertDialog(
+          title: Text(errorMessage),
+          content: Text(errorMessage),
+        );
+      },
+    );
+  }
+
 
 
 }

@@ -1,7 +1,6 @@
 import 'dart:core';
-
-
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class Video {
    String? id;
@@ -19,13 +18,14 @@ class Video {
      };
    }
 
-   factory Video.fromSnapshot(DocumentSnapshot < Map<String , dynamic>> documentSnapshot){
-     final data = documentSnapshot.data()!;
+   factory Video.fromDataSnapshot(DataSnapshot dataSnapshot) {
+     Map<String, dynamic> data = Map<String, dynamic>.from(dataSnapshot.value as Map<dynamic, dynamic>);
      return Video(
-         id: documentSnapshot.id ,
+         id: dataSnapshot.key,
          name: data["name"],
          url: data["url"],
          description: data["description"]
      );
    }
+
  }

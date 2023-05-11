@@ -16,14 +16,16 @@ class InputTextWidget extends StatelessWidget {
       controller: controller,
       decoration: InputDecoration(
         labelText: lableString,
+
         prefixIcon: iconData!= null
             ? Icon(iconData)
-            :  Padding(
-                  padding:  const EdgeInsets.all(8),
-                  child: Image.asset(assetsRefrence! , width: 10,),
+            :  const Padding(
+                  padding:  EdgeInsets.all(8),
+
         ),
         labelStyle: const TextStyle(
           fontSize: 18,
+          color: Colors.black,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(6),

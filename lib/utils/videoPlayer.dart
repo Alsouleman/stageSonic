@@ -2,19 +2,18 @@ import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
-
-class ScreenVideo extends StatefulWidget {
+class VideoPlayer extends StatefulWidget {
   final String src;
   final VoidCallback? onError;
 
-  const ScreenVideo({Key? key, required this.src, this.onError})
+  const VideoPlayer({Key? key, required this.src, this.onError})
       : super(key: key);
 
   @override
-  State<ScreenVideo> createState() => _ScreenVideoState();
+  State<VideoPlayer> createState() => _VideoPlayerState();
 }
 
-class _ScreenVideoState extends State<ScreenVideo> {
+class _VideoPlayerState extends State<VideoPlayer> {
   VideoPlayerController? _videoPlayerController;
   ChewieController? _controller;
 
@@ -29,8 +28,8 @@ class _ScreenVideoState extends State<ScreenVideo> {
     await Future.wait([_videoPlayerController!.initialize()]);
     _controller = ChewieController(
       videoPlayerController: _videoPlayerController!,
-      autoPlay: true,
-      showControls: false,
+      aspectRatio: 16 /9,
+
     );
 
     _videoPlayerController!.addListener(() {
@@ -44,8 +43,8 @@ class _ScreenVideoState extends State<ScreenVideo> {
 
   @override
   void dispose() {
-    _videoPlayerController!.dispose();
-    _controller!.dispose() ;
+    _videoPlayerController?.dispose();
+    _controller?.dispose();
     super.dispose();
   }
 
@@ -55,9 +54,13 @@ class _ScreenVideoState extends State<ScreenVideo> {
       fit: StackFit.expand,
       children: [
         _controller != null && _controller!.videoPlayerController.value.isInitialized
-            ? Chewie(controller: _controller!)
+            ? Container(
+          color: Colors.black,
+          child: Chewie(controller: _controller!),
+        )
             : const SizedBox(),
       ],
     );
   }
+
 }

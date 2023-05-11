@@ -1,5 +1,4 @@
 import 'dart:core';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 class Video {
@@ -8,13 +7,14 @@ class Video {
    String? url;
    String? description;
 
+
    Video ({ this.id, required this.name , required this.url ,  required this.description});
 
    Map< String, dynamic > toJson ( ) {
      return {
-       'name': this.name!,
-       'description': this.description == null ? '' : this.description!,
-       'url': this.url!,
+       'name': name!,
+       'description': description == null ? '' : description!,
+       'url': url!,
      };
    }
 

@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'package:stagesonic_video/utils.dart';
+import 'package:stagesonic_video/utils/utils.dart';
 import 'package:zego_uikit_prebuilt_video_conference/zego_uikit_prebuilt_video_conference.dart';
 import 'package:flutter/material.dart';
 

@@ -1,34 +1,33 @@
 {
   "project_info": {
-    "project_number": "797496668692",
-    "firebase_url": "https://stagesonic-f12ea-default-rtdb.europe-west1.firebasedatabase.app",
-    "project_id": "stagesonic-f12ea",
-    "storage_bucket": "stagesonic-f12ea.appspot.com"
+    "project_number": "1048915393903",
+    "project_id": "finalstorage-cd881",
+    "storage_bucket": "finalstorage-cd881.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:797496668692:android:08c6799f5f4971fc656d01",
+        "mobilesdk_app_id": "1:1048915393903:android:9ccab6e4b08ef1024cbc9a",
         "android_client_info": {
           "package_name": "alsouleman.stage_sonic2"
         }
       },
       "oauth_client": [
         {
-          "client_id": "797496668692-elc0ufoo1ak9nb0f19mknbnfpf3ukp48.apps.googleusercontent.com",
+          "client_id": "1048915393903-3sg2gadjcjccrce43tnnh3ofqskidi69.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDJ5df3oVy5eec9SxnjHpKJS-yU1EVgyTY"
+          "current_key": "AIzaSyCTUqJ3A3SXMWMgnpsbixeyjVYAin2Zobw"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "797496668692-elc0ufoo1ak9nb0f19mknbnfpf3ukp48.apps.googleusercontent.com",
+              "client_id": "1048915393903-3sg2gadjcjccrce43tnnh3ofqskidi69.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

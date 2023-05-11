@@ -1,22 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class CardWidegt extends StatelessWidget {
-  String title;
-  String subtitle;
-  IconData icon;
-  Widget route;
-   CardWidegt({Key? key, required this.title , required this.subtitle ,required this.icon , required this.route}) : super(key: key);
+class CardWidget extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final Widget route;
+  final String date;
+  final String time;
 
-
+  const CardWidget({
+    Key? key,
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.route,
+    required this.date,
+    required this.time,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     double w = MediaQuery.of(context).size.width;
     return Opacity(
-      opacity: 1, //_animation.value,
+      opacity: 1,
       child: Transform.translate(
-        offset: const Offset(0, 1.1 ), //_animation2.value
+        offset: const Offset(0, 1.1),
         child: Container(
           height: w / 2.3,
           width: w,
@@ -27,14 +36,19 @@ class CardWidegt extends StatelessWidget {
             onTap: () {
               HapticFeedback.lightImpact();
               Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => route));
+                context,
+                MaterialPageRoute(builder: (context) => route),
+              );
             },
             child: Container(
               decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(.2),
-                  borderRadius: const BorderRadius.all(Radius.circular(30)),
-                  border: Border.all(
-                      color: Colors.white.withOpacity(.1), width: 1)),
+                color: Colors.white.withOpacity(.2),
+                borderRadius: const BorderRadius.all(Radius.circular(30)),
+                border: Border.all(
+                  color: Colors.white.withOpacity(.1),
+                  width: 1,
+                ),
+              ),
               child: Padding(
                 padding: EdgeInsets.all(w / 50),
                 child: Row(
@@ -44,8 +58,9 @@ class CardWidegt extends StatelessWidget {
                       height: w / 3,
                       width: w / 3,
                       decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(.2),
-                          borderRadius: BorderRadius.circular(20)),
+                        color: Colors.white.withOpacity(.2),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
                       child: Icon(
                         icon,
                         color: Colors.white,
@@ -85,7 +100,17 @@ class CardWidegt extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            'Tap to know more',
+                            'Datum: $date  Zeit: $time',
+                            maxLines: 1,
+                            softWrap: true,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: w / 30,
+                            ),
+                          ),
+                          Text(
+                            'Tippen, um mehr zu erfahren',
                             maxLines: 1,
                             softWrap: true,
                             overflow: TextOverflow.ellipsis,

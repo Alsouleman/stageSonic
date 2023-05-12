@@ -1,28 +1,23 @@
 import 'package:flutter/material.dart';
 
 class InputTextWidget extends StatelessWidget {
-  const InputTextWidget({Key? key, required this.controller, this.iconData, this.assetsRefrence, required this.lableString, required this.isObscure}) : super(key: key);
+  const InputTextWidget({Key? key, required this.controller, this.prefixIcon, required this.label, required this.isObscure, this.style}) : super(key: key);
   final TextEditingController controller;
-  final IconData? iconData;
-  final String? assetsRefrence ;
-  final String lableString;
+  final TextStyle? style;
+  final Widget? prefixIcon;
+  final Widget label;
   final bool   isObscure;
-
-
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+      style: style,
       controller: controller,
       decoration: InputDecoration(
-        labelText: lableString,
+        label: label,
+        prefixIcon: prefixIcon,
+        helperStyle: const TextStyle(color: Colors.black),
 
-        prefixIcon: iconData!= null
-            ? Icon(iconData)
-            :  const Padding(
-                  padding:  EdgeInsets.all(8),
-
-        ),
         labelStyle: const TextStyle(
           fontSize: 18,
           color: Colors.black,

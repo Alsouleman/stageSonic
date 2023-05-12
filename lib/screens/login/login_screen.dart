@@ -1,21 +1,27 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:stagesonic_video/Widgets/BoxShadowWidget.dart';
 import 'package:stagesonic_video/Widgets/InputTextWidget.dart';
 import 'package:stagesonic_video/screens/home/main.dart';
 import 'package:stagesonic_video/screens/login/login_screen.dart';
+import 'package:stagesonic_video/screens/login/registeration.dart';
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  TextEditingController usernameController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   bool rememberpwd = false;
-  bool sec = true;
+  bool hide = true;
   var visable = const Icon(
     Icons.visibility,
     color: Color(0xff4c5166),
@@ -24,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
     Icons.visibility_off,
     color: Color(0xff4c5164),
   );
-
+  TextStyle inputTextStyle = const TextStyle(color: Colors.black);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,10 +67,12 @@ class _LoginScreenState extends State<LoginScreen> {
                             height: 50,
                             width: 350,
                             child:  InputTextWidget(
-                                controller: usernameController,
-                                lableString: "Email",
-
-                                isObscure: false)),
+                                controller: _emailController,
+                                prefixIcon: const Icon(Icons.email_outlined, color: Colors.black,),
+                                label: const Text("Email"),
+                                style: inputTextStyle,
+                                isObscure: false
+                            )),
                         const SizedBox(
                           height: 40,
                         ),
@@ -72,10 +80,12 @@ class _LoginScreenState extends State<LoginScreen> {
                             height: 50,
                             width: 350,
                             child:  InputTextWidget(
-                                controller: passwordController,
-                                lableString: "Password",
-
-                                isObscure: false)),
+                                controller: _passwordController,
+                                label: const Text("Password"),
+                                style: inputTextStyle,
+                                prefixIcon: visable,
+                                isObscure: true
+                            )),
                         const SizedBox(
                           height: 60,
                         ),
@@ -84,13 +94,20 @@ class _LoginScreenState extends State<LoginScreen> {
                             width: 350,
 
                             child: TextButton(
-                              onPressed: (){
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) =>  const MyHomePage(title: "title")),
-                                );
+                              onPressed: () async {
+                                FirebaseAuth.instance.signInWithEmailAndPassword(
+                                    email: _emailController.text.trim(),
+                                    password: _passwordController.text.trim()
+                                ).then((value) =>
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(builder: (context) =>  const MyHomePage(title: "title")),
+                                    )
+                                ).onError((error, stackTrace) => _showErrorDialog(" ${error.toString()}", 5));
+
                               },
-                              child: const Text("Register Now.." , style: TextStyle(
+
+                              child: const Text("Log In" , style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -103,12 +120,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text("haven't we met yet? " , style: TextStyle(color: Colors.black,)),
+                            const Text("haven't we met yet before? " , style: TextStyle(color: Colors.black,)),
                             TextButton(
                                 onPressed: (){
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context) =>   const MyHomePage(title: "title")),
+                                    MaterialPageRoute(builder: (context) =>   Registeration()),
                                   );
                                 },
                                 child: const Text("Registration..")
@@ -172,5 +189,21 @@ class _LoginScreenState extends State<LoginScreen> {
 
 
 
+  void _showErrorDialog(String errorMessage, int duration) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        Future.delayed(Duration(seconds: duration), () {
+          if (Navigator.canPop(context)) {
+            Navigator.of(context).pop();
+          }
+        });
 
+        return AlertDialog(
+          title: Text(errorMessage),
+          content: Text(errorMessage),
+        );
+      },
+    );
+  }
 }

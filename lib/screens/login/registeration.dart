@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -5,15 +7,18 @@ import 'package:stagesonic_video/Widgets/BoxShadowWidget.dart';
 import 'package:stagesonic_video/Widgets/InputTextWidget.dart';
 import 'package:stagesonic_video/screens/home/main.dart';
 import 'package:stagesonic_video/screens/login/login_screen.dart';
+import 'package:stagesonic_video/model/User.dart';
 
-class registeration extends StatefulWidget {
+class Registeration extends StatefulWidget {
   @override
-  _registerationState createState() => _registerationState();
+  _RegisterationState createState() => _RegisterationState();
 }
 
-class _registerationState extends State<registeration> {
-  TextEditingController usernameController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
+class _RegisterationState extends State<Registeration> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  DatabaseReference dbRef = FirebaseDatabase.instance.ref().child('users');
   bool rememberpwd = false;
   bool sec = true;
   var visable = const Icon(
@@ -24,7 +29,7 @@ class _registerationState extends State<registeration> {
     Icons.visibility_off,
     color: Color(0xff4c5164),
   );
-
+  TextStyle inputTextStyle = const TextStyle(color: Colors.black);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,6 +59,15 @@ class _registerationState extends State<registeration> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
+                        BoxShadowWidget(
+                            height: 50,
+                            width: 350,
+                            child:  InputTextWidget(
+                                controller: _usernameController,
+                                style: inputTextStyle,
+                                label: const Text("Username"),
+                                prefixIcon: const Icon(Icons.email_outlined, color: Colors.black,),
+                                isObscure: false)),
                         const SizedBox(
                           height: 100,
                         ),
@@ -61,9 +75,10 @@ class _registerationState extends State<registeration> {
                             height: 50,
                             width: 350,
                             child:  InputTextWidget(
-                                controller: usernameController,
-                                lableString: "Email",
-
+                                controller: _emailController,
+                                style: inputTextStyle,
+                                label: const Text("Email"),
+                                prefixIcon: const Icon(Icons.email_outlined, color: Colors.black,),
                                 isObscure: false)),
                         const SizedBox(
                           height: 40,
@@ -72,10 +87,13 @@ class _registerationState extends State<registeration> {
                             height: 50,
                             width: 350,
                             child:  InputTextWidget(
-                                controller: passwordController,
-                                lableString: "Password",
-
-                                isObscure: false)),
+                                controller: _passwordController,
+                                label: const Text("Password"),
+                                style: inputTextStyle,
+                                prefixIcon: visable,
+                                isObscure: true
+                            )
+                        ),
                         const SizedBox(
                           height: 60,
                         ),
@@ -85,12 +103,33 @@ class _registerationState extends State<registeration> {
 
                             child: TextButton(
                               onPressed: (){
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) =>  const MyHomePage(title: "title")),
-                                );
+
+                                FirebaseAuth.instance.createUserWithEmailAndPassword(
+                                    email: _emailController.text.trim(),
+                                    password: _passwordController.text.trim()
+                                ).then((credential) {
+                               if(credential.user?.uid != null) {
+                                 MyUser user = MyUser(
+                                     id: credential.user?.uid,
+                                     email: _emailController.text.trim(),
+                                     password: _passwordController.text.trim(),
+                                     username: _usernameController.text.trim(), // Der Name ist zunächst leer
+                                     profileImageUrl: '', // Das Profilbild ist zunächst leer
+                                     videos: [] // Die Liste der Videos ist zunächst leer
+                                 );
+                                 dbRef.child('${user.id}').set(user.toJson());
+                                 Navigator.pushReplacement(
+                                   context,
+                                   MaterialPageRoute(builder: (context) =>  const MyHomePage(title: "title")),
+                                 );
+                               }
+                                }).onError( (error, stackTrace) async {
+                                 _showErrorDialog(error.toString(), 5);
+                                });
+
+
                               },
-                              child: const Text("Register Now.." , style: TextStyle(
+                              child: const Text("SIGN UP" , style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -103,7 +142,7 @@ class _registerationState extends State<registeration> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                          const Text("have we met? " , style: TextStyle(color: Colors.black,)),
+                          const Text("have we met? " , style: TextStyle(color: Colors.black,fontStyle: FontStyle.italic)),
                           TextButton(
                               onPressed: (){
                                 Navigator.push(
@@ -111,7 +150,11 @@ class _registerationState extends State<registeration> {
                                   MaterialPageRoute(builder: (context) =>   LoginScreen()),
                                 );
                               },
-                              child: const Text("Login..")
+                              child: const Text("Login..",
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontStyle: FontStyle.italic
+                                ),)
                           )
                         ],),
 
@@ -170,7 +213,23 @@ class _registerationState extends State<registeration> {
     );
   }
 
+  void _showErrorDialog(String errorMessage, int duration) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        Future.delayed(Duration(seconds: duration), () {
+          if (Navigator.canPop(context)) {
+            Navigator.of(context).pop();
+          }
+        });
 
+        return AlertDialog(
+          title: Text(errorMessage),
+          content: Text(errorMessage),
+        );
+      },
+    );
+  }
 
 
 }

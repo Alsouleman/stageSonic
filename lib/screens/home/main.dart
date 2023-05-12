@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -9,21 +8,19 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:stagesonic_video/Widgets/BoxShadowWidget.dart';
 import 'package:stagesonic_video/model/Video.dart';
+import 'package:stagesonic_video/screens/userProfile/UserProfilePage.dart';
 import 'package:stagesonic_video/screens/watch_other/displayVideos.dart';
 import 'package:stagesonic_video/screens/presentation_planner/presentation_planner.dart';
-import '../login/registeration.dart';
+import '../login/login_screen.dart';
 import '../video_conference/VideoConference.dart';
 import 'dart:io';
 import 'package:get/get.dart';
 import 'package:file_picker/file_picker.dart';
 
-import '../login/login_screen.dart';
-
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp( const MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -34,7 +31,9 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
         theme: ThemeData.dark().copyWith(scaffoldBackgroundColor: Colors.black),
-        home:    registeration(),
+        home: FirebaseAuth.instance.currentUser?.uid == null
+            ? const LoginScreen()
+            : const MyHomePage(title: ""),
 
         //const MyHomePage(title: 'Flutter Demo Home '),
         routes: const {});
@@ -57,155 +56,159 @@ class _MyHomePageState extends State<MyHomePage> {
   ImagePicker picker = ImagePicker();
   bool okToUpload = false;
   Color iconColor = Colors.white24;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
-          backgroundColor: Colors.grey[350],
-          body: Center(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 10),
-              child: Column(
-                children: [
-
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  BoxShadowWidget(
-                    height: 75,
-                    width: 200,
-                    child: TextButton(
-                        onPressed: () => {
-
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const DisplayVideos(),
-                                  ))
-                            },
-                        child: const Center(
-                            widthFactor: 2.85,
-                            heightFactor: 2,
-                            child: Text(
-                              "Watch others",
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20),
-                            ))),
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  BoxShadowWidget(
-                    height: 50,
-                    width: 300,
-                    child: TextButton(
-                        onPressed: () => {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          VideoConference(conferenceID: '1')))
-                            },
-                        child: const Center(
-                            widthFactor: 2.85,
-                            heightFactor: 2,
-                            child: Text(
-                              "Go Live",
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20),
-                            ))),
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  BoxShadowWidget(
-                    height: 50,
-                    width: 300,
-                    child: TextButton(
-                        onPressed: () {
-                          _selectVideo(
-                              "Three Minute Thesis winning presentation",
-                              "Watch Emily Johnston's Three Minute Thesis UniSA Grand Final winning presentation, 'Mosquito research: saving lives with pantyhose and paperclips'. Emily also won the People's Choice award.");
-                        },
-                        child: const Center(
-                            widthFactor: 2.85,
-                            heightFactor: 2,
-                            child: Text(
-                              "add Video from Gallery",
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20),
-                            ))),
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  BoxShadowWidget(
-                    height: 50,
-                    width: 300,
-                    child: TextButton(
-                        onPressed: () {},
-                        child: const Center(
-                            widthFactor: 2.85,
-                            heightFactor: 2,
-                            child: Text(
-                              "Take a video",
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20),
-                            ))),
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  BoxShadowWidget(
-                    height: 50,
-                    width: 300,
-                    child: TextButton(
-                        onPressed: () => {
-                          Get.to(const PresentationPlanner())
-                        },
-                        child: const Center(
-                            widthFactor: 2.85,
-                            heightFactor: 2,
-                            child: Text(
-                              "Go Live",
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20),
-                            ))),
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  BoxShadowWidget(
-                    height: 50,
-                    width: 300,
-                    child: TextButton(
-                        onPressed: signIn,
-                        child: const Center(
-                            widthFactor: 2.85,
-                            heightFactor: 2,
-                            child: Text(
-                              "Login....",
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20),
-                            ))),
-                  ),
-                   ],
-              ),
+    return Scaffold(
+      backgroundColor: Colors.grey[350],
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 50),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    IconButton(
+                      onPressed: () async {
+                        await FirebaseAuth.instance
+                            .signOut()
+                            .then((value) => Get.to(const LoginScreen()));
+                      },
+                      icon: const Icon(Icons.logout),
+                    ),
+                    const SizedBox(
+                      width: 50,
+                    ),
+                    IconButton(
+                      onPressed: () async {
+                        var userId = FirebaseAuth.instance.currentUser?.uid;
+                        if (userId != null) {
+                          Get.to(UserProfilePage(userId: userId));
+                        } else {
+                          _showErrorDialog("Fehler beim loading  User-ID", 5);
+                        }
+                      },
+                      icon: const Icon(Icons.person),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                BoxShadowWidget(
+                  height: 75,
+                  width: 200,
+                  child: TextButton(
+                      onPressed: () => {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const DisplayVideos(),
+                                ))
+                          },
+                      child: const Center(
+                          widthFactor: 2.85,
+                          heightFactor: 2,
+                          child: Text(
+                            "Watch others",
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20),
+                          ))),
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                BoxShadowWidget(
+                  height: 50,
+                  width: 300,
+                  child: TextButton(
+                      onPressed: () => {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        VideoConference(conferenceID: '1')))
+                          },
+                      child: const Center(
+                          widthFactor: 2.85,
+                          heightFactor: 2,
+                          child: Text(
+                            "Go Live",
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20),
+                          ))),
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                BoxShadowWidget(
+                  height: 50,
+                  width: 300,
+                  child: TextButton(
+                      onPressed: () {
+                        _selectVideo("Three Minute Thesis winning presentation",
+                            "Watch Emily Johnston's Three Minute Thesis UniSA Grand Final winning presentation, 'Mosquito research: saving lives with pantyhose and paperclips'. Emily also won the People's Choice award.");
+                      },
+                      child: const Center(
+                          widthFactor: 2.85,
+                          heightFactor: 2,
+                          child: Text(
+                            "add Video from Gallery",
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20),
+                          ))),
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                BoxShadowWidget(
+                  height: 50,
+                  width: 300,
+                  child: TextButton(
+                      onPressed: () {},
+                      child: const Center(
+                          widthFactor: 2.85,
+                          heightFactor: 2,
+                          child: Text(
+                            "Take a video",
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20),
+                          ))),
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                BoxShadowWidget(
+                  height: 50,
+                  width: 300,
+                  child: TextButton(
+                      onPressed: () => {Get.to(const PresentationPlanner())},
+                      child: const Center(
+                          widthFactor: 2.85,
+                          heightFactor: 2,
+                          child: Text(
+                            "Go Live",
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20),
+                          ))),
+                ),
+              ],
             ),
           ),
+        ),
+      ),
     );
   }
 
@@ -222,16 +225,21 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future _uploadVideo(String videoName, String description) async {
     try {
+      final userId = FirebaseAuth.instance.currentUser?.uid;
       final path = 'videos/$videoName/${videoFile!.path}';
       final ref = FirebaseStorage.instance.ref().child(path);
       task = ref.putFile(videoFile!);
       final snapshot = await task!.whenComplete(() {});
       final urlDownload = await snapshot.ref.getDownloadURL();
 
-      final Video videoToUpload =
-          Video(name: videoName, url: urlDownload, description: description);
-      DatabaseReference dbRef = FirebaseDatabase.instance.ref().child('data');
-      dbRef.push().set(videoToUpload.toJson());
+      final Video videoToUpload = Video(
+          userId: userId,
+          name: videoName,
+          url: urlDownload,
+          description: description);
+      DatabaseReference dbRef = FirebaseDatabase.instance.ref();
+      dbRef.child('data').push().set(videoToUpload.toJson());
+      dbRef.child('users').child('$userId').child('Videos').set(videoToUpload.toJson());
     } catch (e) {
       _showErrorDialog(': $e', 3);
     }
@@ -287,26 +295,4 @@ class _MyHomePageState extends State<MyHomePage> {
       },
     );
   }
-
-  Color calculateIconColor(Color backgroundColor) {
-    // Berechnet die Helligkeit des Hintergrunds
-    double brightness = backgroundColor.computeLuminance();
-
-    // Wenn der Hintergrund dunkel ist, geben Sie eine hellere Icon-Farbe zurück, sonst eine dunklere
-    if (brightness < 0.5) {
-      return Colors.white;
-    } else {
-      return Colors.black;
-    }
-  }
-
-  Future<void> signIn() async{
-    await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: "t@t.com",
-        password: "12345678"
-    );
-  }
 }
-
-
-

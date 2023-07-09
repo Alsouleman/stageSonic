@@ -3,11 +3,13 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:stagesonic_video/Widgets/BoxShadowWidget.dart';
-import 'package:stagesonic_video/Widgets/InputTextWidget.dart';
-import 'package:stagesonic_video/screens/home/main.dart';
+import 'package:stagesonic_video/Widgets/BoxShadow_widget.dart';
+import 'package:stagesonic_video/Widgets/inputText_widget.dart';
+import 'package:stagesonic_video/main.dart';
 import 'package:stagesonic_video/screens/login/login_screen.dart';
 import 'package:stagesonic_video/model/User.dart';
+
+import '../watchOther_screen/home_page.dart';
 
 class Registeration extends StatefulWidget {
   @override
@@ -42,7 +44,6 @@ class _RegisterationState extends State<Registeration> {
               SizedBox(
                 height: double.infinity,
                 width: double.infinity,
-
                 child: Padding(
                   padding: const EdgeInsets.only(right: 20, left: 20),
                   child: SingleChildScrollView(
@@ -62,11 +63,16 @@ class _RegisterationState extends State<Registeration> {
                         BoxShadowWidget(
                             height: 50,
                             width: 350,
-                            child:  InputTextWidget(
+                            onClicked: () {  },
+                            backgroundColor: Colors.grey[300]!,
+                            child: InputTextWidget(
                                 controller: _usernameController,
                                 style: inputTextStyle,
                                 label: const Text("Username"),
-                                prefixIcon: const Icon(Icons.email_outlined, color: Colors.black,),
+                                prefixIcon: const Icon(
+                                  Icons.email_outlined,
+                                  color: Colors.black,
+                                ),
                                 isObscure: false)),
                         const SizedBox(
                           height: 100,
@@ -74,11 +80,16 @@ class _RegisterationState extends State<Registeration> {
                         BoxShadowWidget(
                             height: 50,
                             width: 350,
-                            child:  InputTextWidget(
+                            onClicked: () {  },
+                            backgroundColor: Colors.grey[300]!,
+                            child: InputTextWidget(
                                 controller: _emailController,
                                 style: inputTextStyle,
                                 label: const Text("Email"),
-                                prefixIcon: const Icon(Icons.email_outlined, color: Colors.black,),
+                                prefixIcon: const Icon(
+                                  Icons.email_outlined,
+                                  color: Colors.black,
+                                ),
                                 isObscure: false)),
                         const SizedBox(
                           height: 40,
@@ -86,95 +97,100 @@ class _RegisterationState extends State<Registeration> {
                         BoxShadowWidget(
                             height: 50,
                             width: 350,
-                            child:  InputTextWidget(
+                            onClicked: () {  },
+                            backgroundColor: Colors.grey[300]!,
+                            child: InputTextWidget(
                                 controller: _passwordController,
                                 label: const Text("Password"),
                                 style: inputTextStyle,
                                 prefixIcon: visable,
-                                isObscure: true
-                            )
-                        ),
+                                isObscure: true)),
                         const SizedBox(
                           height: 60,
                         ),
                         BoxShadowWidget(
                             height: 40,
                             width: 350,
-
+                            onClicked: () {  },
+                            backgroundColor: Colors.grey[300]!,
                             child: TextButton(
-                              onPressed: (){
-
-                                FirebaseAuth.instance.createUserWithEmailAndPassword(
-                                    email: _emailController.text.trim(),
-                                    password: _passwordController.text.trim()
-                                ).then((credential) {
-                               if(credential.user?.uid != null) {
-                                 MyUser user = MyUser(
-                                     id: credential.user?.uid,
-                                     email: _emailController.text.trim(),
-                                     password: _passwordController.text.trim(),
-                                     username: _usernameController.text.trim(), // Der Name ist zunächst leer
-                                     profileImageUrl: '', // Das Profilbild ist zunächst leer
-                                     videos: [] // Die Liste der Videos ist zunächst leer
-                                 );
-                                 dbRef.child('${user.id}').set(user.toJson());
-                                 Navigator.pushReplacement(
-                                   context,
-                                   MaterialPageRoute(builder: (context) =>  const MyHomePage(title: "title")),
-                                 );
-                               }
-                                }).onError( (error, stackTrace) async {
-                                 _showErrorDialog(error.toString(), 5);
+                              onPressed: () {
+                                FirebaseAuth.instance
+                                    .createUserWithEmailAndPassword(
+                                        email: _emailController.text.trim(),
+                                        password:
+                                            _passwordController.text.trim())
+                                    .then((credential) {
+                                  if (credential.user?.uid != null) {
+                                    MyUser user = MyUser(
+                                        id: credential.user?.uid,
+                                        email: _emailController.text.trim(),
+                                        username:
+                                            _usernameController.text.trim(),
+                                        profileImageUrl: 'https://w0.peakpx.com/wallpaper/979/89/HD-wallpaper-purple-smile-design-eye-smily-profile-pic-face.jpg',
+                                        about: "about me *************",
+                                        videos: []
+                                    );
+                                    dbRef
+                                        .child('${user.id}')
+                                        .set(user.toJson());
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const StartScreen()),
+                                    );
+                                  }
+                                }).onError((error, stackTrace) async {
+                                  _showErrorDialog(error.toString(), 5);
                                 });
-
-
                               },
-                              child: const Text("SIGN UP" , style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),),
-                            )
-                        ),
+                              child: const Text(
+                                "SIGN UP",
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            )),
                         const SizedBox(
                           height: 30,
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                          const Text("have we met? " , style: TextStyle(color: Colors.black,fontStyle: FontStyle.italic)),
-                          TextButton(
-                              onPressed: (){
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) =>   LoginScreen()),
-                                );
-                              },
-                              child: const Text("Login..",
+                            const Text("have we met? ",
                                 style: TextStyle(
                                     color: Colors.black,
-                                    fontStyle: FontStyle.italic
-                                ),)
-                          )
-                        ],),
-
+                                    fontStyle: FontStyle.italic)),
+                            TextButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => LoginScreen()),
+                                  );
+                                },
+                                child: const Text(
+                                  "Login..",
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontStyle: FontStyle.italic),
+                                ))
+                          ],
+                        ),
                       ],
                     ),
                   ),
                 ),
               ),
-
-
             ],
           ),
         ),
       ),
     );
   }
-
-
-
-
 
   Widget buildRememberassword() {
     return SizedBox(
@@ -188,9 +204,7 @@ class _RegisterationState extends State<Registeration> {
                 checkColor: Colors.blueGrey,
                 activeColor: Colors.white,
                 onChanged: (value) {
-                  setState(() {
-
-                  });
+                  setState(() {});
                 },
               )),
           const Text(
@@ -230,6 +244,4 @@ class _RegisterationState extends State<Registeration> {
       },
     );
   }
-
-
 }

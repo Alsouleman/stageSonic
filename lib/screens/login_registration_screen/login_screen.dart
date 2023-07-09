@@ -2,13 +2,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:stagesonic_video/Widgets/BoxShadowWidget.dart';
-import 'package:stagesonic_video/Widgets/InputTextWidget.dart';
-import 'package:stagesonic_video/screens/home/main.dart';
-import 'package:stagesonic_video/screens/login/login_screen.dart';
+import 'package:stagesonic_video/Widgets/BoxShadow_widget.dart';
+import 'package:stagesonic_video/Widgets/inputText_widget.dart';
 import 'package:stagesonic_video/screens/login/registeration.dart';
+
+import '../../main.dart';
+import '../watchOther_screen/home_page.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -43,76 +42,84 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(
                 height: double.infinity,
                 width: double.infinity,
-
                 child: Padding(
                   padding: const EdgeInsets.only(right: 20, left: 20),
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
                         const SizedBox(
-                          height: 200,
+                          height: 100,
                         ),
                         const Text(
-                          "Hello User! ☺️",
+                          "Welcome Back! ☺️",
                           style: TextStyle(
                             color: Colors.black,
-                            fontSize: 40,
+                            fontSize: 35,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         const SizedBox(
-                          height: 100,
+                          height: 150,
                         ),
                         BoxShadowWidget(
-                            height: 50,
+                          boxRadius: 50,
+                            height: 60,
                             width: 350,
-                            child:  InputTextWidget(
+                            onClicked: () {  },
+                            backgroundColor: Colors.grey[300]!,
+                            child: InputTextWidget(
                                 controller: _emailController,
-                                prefixIcon: const Icon(Icons.email_outlined, color: Colors.black,),
+                                prefixIcon: const Icon(
+                                  Icons.email_outlined,
+                                  color: Colors.black,
+                                ),
                                 label: const Text("Email"),
                                 style: inputTextStyle,
-                                isObscure: false
-                            )),
+                                isObscure: false)),
                         const SizedBox(
-                          height: 40,
+                          height: 30,
                         ),
                         BoxShadowWidget(
-                            height: 50,
+                          boxRadius: 50,
+                            height: 60,
                             width: 350,
-                            child:  InputTextWidget(
+                            onClicked: () {  },
+                            backgroundColor: Colors.grey[300]!,
+                            child: InputTextWidget(
                                 controller: _passwordController,
                                 label: const Text("Password"),
                                 style: inputTextStyle,
                                 prefixIcon: visable,
-                                isObscure: true
-                            )),
+                                isObscure: true)),
                         const SizedBox(
                           height: 60,
                         ),
                         BoxShadowWidget(
-                            height: 40,
+                            height: 60,
                             width: 350,
-
-                            child: TextButton(
-                              onPressed: () async {
-                                FirebaseAuth.instance.signInWithEmailAndPassword(
-                                    email: _emailController.text.trim(),
-                                    password: _passwordController.text.trim()
-                                ).then((value) =>
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(builder: (context) =>  const MyHomePage(title: "title")),
-                                    )
-                                ).onError((error, stackTrace) => _showErrorDialog(" ${error.toString()}", 5));
-
-                              },
-
-                              child: const Text("Log In" , style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 18,
+                            onClicked: () async {
+                              FirebaseAuth.instance
+                                  .signInWithEmailAndPassword(
+                                  email: _emailController.text.trim(),
+                                  password:
+                                  _passwordController.text.trim())
+                                  .then((value) => Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                    const StartScreen()),
+                              ))
+                                  .onError((error, stackTrace) =>
+                                  _showErrorDialog(
+                                      " ${error.toString()}", 5));
+                            },
+                            backgroundColor: Colors.grey[300]!,
+                            child: const Center(
+                              child: Text('Log In', style: TextStyle(
                                 fontWeight: FontWeight.bold,
+                                fontSize: 20,
                               ),),
-                            )
+                            ),
                         ),
                         const SizedBox(
                           height: 30,
@@ -120,35 +127,32 @@ class _LoginScreenState extends State<LoginScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text("haven't we met yet before? " , style: TextStyle(color: Colors.black,)),
+                            const Text("haven't we met yet before? ",
+                                style: TextStyle(
+                                  color: Colors.black,
+                                )),
                             TextButton(
-                                onPressed: (){
+                                onPressed: () {
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context) =>   Registeration()),
+                                    MaterialPageRoute(
+                                        builder: (context) => Registeration()),
                                   );
                                 },
-                                child: const Text("Registration..")
-                            )
-                          ],),
-
+                                child: const Text("SIGN UP.." , style: TextStyle(color: Colors.deepPurple),))
+                          ],
+                        ),
                       ],
                     ),
                   ),
                 ),
               ),
-
-
             ],
           ),
         ),
       ),
     );
   }
-
-
-
-
 
   Widget buildRememberassword() {
     return SizedBox(
@@ -162,9 +166,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 checkColor: Colors.blueGrey,
                 activeColor: Colors.white,
                 onChanged: (value) {
-                  setState(() {
-
-                  });
+                  setState(() {});
                 },
               )),
           const Text(
@@ -186,8 +188,6 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-
-
 
   void _showErrorDialog(String errorMessage, int duration) {
     showDialog(

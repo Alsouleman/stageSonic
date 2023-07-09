@@ -1,19 +1,20 @@
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
+import 'package:stagesonic_video/temp/SplashRippleEffect.dart';
 import 'package:video_player/video_player.dart';
 
-class VideoPlayer extends StatefulWidget {
+class VideoPlayerWithURL extends StatefulWidget {
   final String src;
   final VoidCallback? onError;
 
-  const VideoPlayer({Key? key, required this.src, this.onError})
+  const VideoPlayerWithURL({Key? key, required this.src, this.onError})
       : super(key: key);
 
   @override
-  State<VideoPlayer> createState() => _VideoPlayerState();
+  State<VideoPlayerWithURL> createState() => _VideoPlayerWithURLState();
 }
 
-class _VideoPlayerState extends State<VideoPlayer> {
+class _VideoPlayerWithURLState extends State<VideoPlayerWithURL> {
   VideoPlayerController? _videoPlayerController;
   ChewieController? _controller;
 
@@ -58,7 +59,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
           color: Colors.black,
           child: Chewie(controller: _controller!),
         )
-            : const SizedBox(),
+            : const SplashRippleEffect(),
       ],
     );
   }

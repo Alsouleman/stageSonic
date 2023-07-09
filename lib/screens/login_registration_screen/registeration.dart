@@ -1,15 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:stagesonic_video/Widgets/BoxShadow_widget.dart';
 import 'package:stagesonic_video/Widgets/inputText_widget.dart';
 import 'package:stagesonic_video/main.dart';
-import 'package:stagesonic_video/screens/login/login_screen.dart';
 import 'package:stagesonic_video/model/User.dart';
-
-import '../watchOther_screen/home_page.dart';
+import 'login_screen.dart';
 
 class Registeration extends StatefulWidget {
   @override
@@ -90,7 +87,10 @@ class _RegisterationState extends State<Registeration> {
                                   Icons.email_outlined,
                                   color: Colors.black,
                                 ),
-                                isObscure: false)),
+                                isObscure: false,
+                                keyboardType: TextInputType.emailAddress
+                            ),
+                        ),
                         const SizedBox(
                           height: 40,
                         ),
@@ -169,7 +169,7 @@ class _RegisterationState extends State<Registeration> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => LoginScreen()),
+                                        builder: (context) => const LoginScreen()),
                                   );
                                 },
                                 child: const Text(

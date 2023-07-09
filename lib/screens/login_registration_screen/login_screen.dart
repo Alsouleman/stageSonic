@@ -4,10 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:stagesonic_video/Widgets/BoxShadow_widget.dart';
 import 'package:stagesonic_video/Widgets/inputText_widget.dart';
-import 'package:stagesonic_video/screens/login/registeration.dart';
+import 'package:stagesonic_video/screens/login_registration_screen/registeration.dart';
+
 
 import '../../main.dart';
-import '../watchOther_screen/home_page.dart';
+import '../watchOther_screen/watch_other_page.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -75,7 +76,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                                 label: const Text("Email"),
                                 style: inputTextStyle,
-                                isObscure: false)),
+                                isObscure: false,
+                              keyboardType: TextInputType.emailAddress
+                            )),
                         const SizedBox(
                           height: 30,
                         ),
@@ -90,7 +93,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                 label: const Text("Password"),
                                 style: inputTextStyle,
                                 prefixIcon: visable,
-                                isObscure: true)),
+                                isObscure: true,
+                              keyboardType: TextInputType.visiblePassword,
+                            )),
                         const SizedBox(
                           height: 60,
                         ),

@@ -5,9 +5,9 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:stagesonic_video/model/User.dart';
-import '../Widgets/VideoPlayer_widget.dart';
-import '../Widgets/profile_widget.dart';
-import '../model/Video.dart';
+import '../../Widgets/VideoPlayer_widget.dart';
+import '../../Widgets/profile_widget.dart';
+import '../../model/Video.dart';
 
 
 class ProfilePage extends StatefulWidget {
@@ -72,6 +72,12 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           Column(
             children: List.generate(widget.user.videos.length, (index) {
+             print("*************");
+             print(widget.user.id);
+             print("*************");
+             print("*************");
+             print(currentUser!.uid);
+             print("*************");
               return Padding(
                 padding: const EdgeInsets.only(bottom: 0),
                 child: Column(
@@ -82,9 +88,23 @@ class _ProfilePageState extends State<ProfilePage> {
                           color: Colors.red,
                           height: MediaQuery.of(context).size.width / 1.78,
                           width: MediaQuery.of(context).size.width,
-                          child: VideoPlayerWithURL(
-                            src: widget.user.videos[index].videoUrl!,
-                            videoID: widget.user.videos[index].id!,
+                          child: Stack(
+                            children: [
+                              VideoPlayerWithURL(
+                                src: widget.user.videos[index].videoUrl!,
+                                userID: currentUser!.uid,
+                                videoID: widget.user.videos[index].id!,
+                              ),
+                              widget.user.videos[index].userId == currentUser!.uid ?  Positioned(
+                                height: 50,
+                                width: MediaQuery.of(context).size.width/0.55,
+                                child: IconButton(
+                                  onPressed: (){
+                                    dbRef.child('users').child(currentUser!.uid).child("videos").child(widget.user.videos[index].id!).remove();
+                                    dbRef.child('data').child(widget.user.videos[index].id!).remove();
+                                  },
+                                  icon: const Icon(Icons.delete, color: Colors.red,),),): const SizedBox(),
+                            ],
                           ),
                         ),
                       ],

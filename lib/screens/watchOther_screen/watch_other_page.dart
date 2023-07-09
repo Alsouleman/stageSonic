@@ -1,7 +1,9 @@
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:stagesonic_video/Widgets/commentSection_widget.dart';
+import 'package:stagesonic_video/model/Comment.dart';
 import 'package:stagesonic_video/model/User.dart';
 import 'package:stagesonic_video/services/userProvider_widget.dart';
 import 'package:stagesonic_video/screens/userProfile/profile_page.dart';
@@ -37,15 +39,6 @@ class _WatchOtherPageState extends State<WatchOtherPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await getVideosFromFirebase();
 
-      dbRef.child('users/${currentUser!.uid}').onValue.listen((event) {
-        var snapshot = event.snapshot;
-        if (snapshot.value != null) {
-          Map data = snapshot.value as Map;
-          MyUser? temp;
-          data.forEach((key, value) { temp = MyUser.fromMap(value); });
-          if(temp != null) user = temp;
-        }
-      });
     });
   }
 
@@ -59,11 +52,12 @@ class _WatchOtherPageState extends State<WatchOtherPage> {
 
   Widget getBody() {
     var size = MediaQuery.of(context).size;
+
     return ListView(
       children: [
         Column(
           children: List.generate(videoUrls.length, (index) {
-             getUser(videoUrls[index].userId);
+              getUser(videoUrls[index].userId);
               if(user != null) {
                 return Padding(
                 padding: const EdgeInsets.only(bottom: 20),
@@ -156,8 +150,7 @@ class _WatchOtherPageState extends State<WatchOtherPage> {
                               ),
                               IconButton(
                                 onPressed: () async {
-                                  if ((await hasUserLikedVideo(
-                                      videoUrls[index].id!)) != true) {
+                                  if ((await hasUserLikedVideo(videoUrls[index].id!)) != true) {
                                     likeVideo(videoUrls[index].id!);
                                   } else {
                                     unlikeVideo(videoUrls[index].id!);
@@ -182,10 +175,28 @@ class _WatchOtherPageState extends State<WatchOtherPage> {
                       ),
                     ),
                     const SizedBox(height: 5,),
-                    CommentSection(
-                        currentUser: currentUser!,
-                        videoID: videoUrls[index].id!,
-                        commentController: _commentController), //Comment part function
+                    IconButton(
+                      icon: const Icon(Icons.add_comment ,color: Colors.white,),
+                      onPressed: () {
+                        showAddCommentDialog(context,videoUrls[index].id!,user!.username);
+                      },
+                    ),
+                    const SizedBox(height: 5,),
+                    Container(
+                      alignment: Alignment.center,
+                      color: Colors.white,
+                      height: 30,
+                      width: MediaQuery.of(context).size.width/0.8,
+                      child:  GestureDetector(
+                        onTap: (){ Navigator.push(context,
+                            MaterialPageRoute(builder: (context) =>   CommentSection(
+                                currentUser: currentUser!,
+                                videoID: videoUrls[index].id!,
+                                commentController: _commentController)));},
+                        child: const Text("Comments"),
+                      ),
+                    ),
+                    //Comment part function
                   ],
                 ),
               );
@@ -375,5 +386,58 @@ class _WatchOtherPageState extends State<WatchOtherPage> {
     }
     return currentCounter;
   }
+
+  void showAddCommentDialog(BuildContext context, String videoID , String userName) {
+    final TextEditingController commentController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Add comment'),
+          content: TextField(
+            controller: commentController,
+            decoration: const InputDecoration(hintText: 'Enter your comment here'),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Send'),
+              onPressed: () async {
+                await addComment(
+                  videoID,
+                  userName,
+                  commentController.text,
+                  currentUser!.uid,
+                );
+                commentController.clear();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+  Future<void> addComment(String videoID,String userName, String commentText, String userID) async {
+    Comment newComment = Comment(
+      id: userID,
+      userName:userName ,
+      userID: userID,
+      comment: commentText,
+      date: DateTime.now(),
+    );
+
+    await dbRef
+        .child('data')
+        .child(videoID)
+        .child('comments')
+        .update({newComment.id: newComment.toJson()});
+  }
+
 
 }

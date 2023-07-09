@@ -1,34 +1,91 @@
 import 'dart:core';
-import 'package:firebase_database/firebase_database.dart';
+
+import 'package:stagesonic_video/model/Comment.dart';
 
 class Video {
-   String? id;
-   String? userId;
-   String? name;
-   String? url;
-   String? description;
+  String? id;
+  String? userId;
+  String? title;
+  String? videoUrl;
+  String? description;
+  String? thumbnail;
+  String? viewCount;
+  DateTime? date;
+  String? subscribeCount;
+  String? likeCount;
+  String? unlikeCount;
+  List<String> likedByUsers;
+  List<Comment> comments;
 
+  Video(
+      {this.id,
+      required this.userId,
+      required this.title,
+      required this.description,
+      required this.videoUrl,
+      required this.thumbnail,
+      required this.viewCount,
+      this.date,
+      required this.subscribeCount,
+      required this.likeCount,
+      required this.unlikeCount,
+      this.likedByUsers = const <String>[],
+        this.comments = const []
+      });
 
-   Video ({ this.id, required this.name, required this.userId , required this.url ,  required this.description});
+  Map<String, dynamic> toJson() {
+    return {
+      'userId': userId,
+      'title': title,
+      'description': description,
+      'videoUrl': videoUrl,
+      'thumbnail': thumbnail,
+      'viewCount': viewCount,
+      'date': date?.toIso8601String(),
+      'subscribeCount': subscribeCount,
+      'likeCount': likeCount,
+      'unlikeCount': unlikeCount,
+      'comments': comments.map((comment) => comment.toJson()).toList(),
+    };
+  }
 
-   Map< String, dynamic > toJson ( ) {
-     return {
-       'name': name!,
-       'userId': userId!,
-       'description': description == null ? '' : description!,
-       'url': url!,
-     };
-   }
+  factory Video.fromMap( String id, Map<dynamic, dynamic> videoData) {
+    List<Comment> comments = [];
+    if (videoData['comments'] != null) {
 
-   factory Video.fromDataSnapshot(DataSnapshot dataSnapshot) {
-     Map<String, dynamic> data = Map<String, dynamic>.from(dataSnapshot.value as Map<dynamic, dynamic>);
-     return Video(
-         id: dataSnapshot.key,
-         userId: data['userId'],
-         name: data["name"],
-         url: data["url"],
-         description: data["description"]
-     );
-   }
+     Map temp=  videoData['comments'] as Map;
+     temp.forEach((key, value) {comments.add(Comment.fromMap(temp));});}
+    return Video(
+      id: id,
+      title: videoData['title'] ?? '',
+      description: videoData['description'] ?? '',
+      videoUrl: videoData['videoUrl'] ?? '',
+      userId: videoData['userId'] ?? '',
+      thumbnail: videoData['thumbnail'] ?? '',
+      viewCount: videoData['viewCount'] ?? '',
+      date: DateTime.parse(videoData['date'] ?? "1970-01-01 12:00:00.000000"),
+      subscribeCount: videoData['subscribeCount'] ?? '',
+      likeCount: videoData['likeCount'] ?? '',
+      unlikeCount: videoData['unlikeCount'] ?? '',
+      likedByUsers: List<String>.from(videoData['likedByUsers'] ?? []),
+      comments : comments
+    );
 
- }
+  }
+
+  @override
+  String toString() {
+    return 'Video'
+        '{ id: $id, '
+           'userId: $userId, '
+           'title: $title, '
+           'videoUrl: $videoUrl, '
+           'description: $description,'
+           'thumbnail: $thumbnail, '
+           'viewCount: $viewCount, '
+           'dayAgo: $date, '
+           'subscribeCount: $subscribeCount, '
+           'likeCount: $likeCount, '
+           'unlikeCount: $unlikeCount }';
+  }
+}

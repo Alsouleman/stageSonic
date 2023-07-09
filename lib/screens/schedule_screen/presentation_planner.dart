@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
@@ -42,7 +43,7 @@ class _PresentationPlannerState extends State<PresentationPlanner> {
         ),
       ),
       body:FirebaseAnimatedList(
-        query: _database.child('presentations'),
+        query: _database.child('presentations').child(FirebaseAuth.instance.currentUser!.uid),
         itemBuilder: (ctx, snapshot, animation, index) {
           String key = snapshot.key!; // Get the key for this presentation
           _showDescription.putIfAbsent(key, () => false); // Initialize if not already present
@@ -77,17 +78,17 @@ class _PresentationPlannerState extends State<PresentationPlanner> {
                       Padding(
                         padding: const EdgeInsets.only(left: 5),
                         child: Text('Title: ${snapshot.child('title').value.toString()}',
-                          style: const TextStyle(fontSize: 20 , fontWeight: FontWeight.bold),),
+                          style: const TextStyle(fontSize: 16 , fontWeight: FontWeight.bold),),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(left: 5 , top: 10),
                         child: Text('Date: ${snapshot.child('date').value.toString()}',
-                          style: const TextStyle(fontSize: 20 , fontWeight: FontWeight.bold),),
+                          style: const TextStyle(fontSize: 16 , fontWeight: FontWeight.bold),),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(left: 5 , top: 10),
                         child: Text('Time: ${snapshot.child('time').value.toString()}',
-                          style: const TextStyle(fontSize: 20 , fontWeight: FontWeight.bold),),
+                          style: const TextStyle(fontSize: 16 , fontWeight: FontWeight.bold),),
                       ),
                       InkWell(
                         onTap: () {
@@ -112,10 +113,10 @@ class _PresentationPlannerState extends State<PresentationPlanner> {
                       ),
                       if (_showDescription[key]! )
                         Padding(
-                          padding: const EdgeInsets.all(10),
+                          padding: const EdgeInsets.all(8),
                           child: Text(
                             'Description:  ${snapshot.child('description').value.toString()}',
-                            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                            style: const TextStyle(fontSize: 15),
                           ),
                         ),
                     ],
@@ -151,12 +152,12 @@ class _PresentationPlannerState extends State<PresentationPlanner> {
   }
 
   void _deletePresentation(String key) {
-    _database.child('presentations').child(key).remove();
+    _database.child('presentations').child(FirebaseAuth.instance.currentUser!.uid).child(key).remove();
   }
   void _addPresentation() {
     String? key = _database.child('presentations').push().key;
     if (key != null) {
-      _database.child('presentations').child(key).set({
+      _database.child('presentations').child(FirebaseAuth.instance.currentUser!.uid).child(key).set({
         'title': _titleController.text,
         'description': _subtitleController.text,
         'date': DateFormat('dd.MM.yyyy').format(_selectedDate),
